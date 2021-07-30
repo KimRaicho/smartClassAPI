@@ -7,4 +7,4 @@ my_img = {'image': open('sheep.jpg', 'rb')}
 
 r = requests.post(address, files=my_img)
 
-print(r.json())
+

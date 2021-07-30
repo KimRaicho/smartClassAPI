@@ -4,7 +4,7 @@ from PIL import Image
 app = Flask(__name__)
 
 
-@app.route('/test/connection/', methods=['POST'])
+@app.route('/test/connection', methods=['POST'])
 def test():
     file = request.files['image']
     img = Image.open(file.stream)
