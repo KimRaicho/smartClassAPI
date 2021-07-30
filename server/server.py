@@ -9,7 +9,7 @@ def test():
     file = request.files['image']
     img = Image.open(file.stream)
 
-    file.save('img.jpg')
+    file.save('image_folder/img.jpg')
 
     return jsonify({'message': 'success', 'size': [img.width, img.height]})
 
