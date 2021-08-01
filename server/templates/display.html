@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en">
+<title>Uploaded File</title>
+{% if filename %}
+  <div>
+      <img src="/server/static/uploads/{{ filename }}">
+  </div>
+{% else %}
+  <h1>Uh-oh! That image doesn't exist!</h1>
+{% endif %}
