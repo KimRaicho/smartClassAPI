@@ -82,8 +82,22 @@ def retrieve(image_id):
     if not img:
         return render_template('display.html', filename=None), 404
     # redirect(url_for('static', filename='uploads/' + img.name), code=301)
-    # TODO: Return to the user a json dict that has ID of image and it's name and the respective classification result
+    # TODO: Return to the user a URL to download the image
     return render_template('display.html', filename=img.name)
+
+
+@app.route("/report", methods=['GET'])
+def send_report():
+    # TODO: Create a query that goes through the db and counts the number of times different classifications appear
+    attentive_score = 180
+    inattentive_score = 95
+    sleeping_score = 12
+
+    return {
+        "attentive": attentive_score,
+        "inattentive": inattentive_score,
+        "sleeping": sleeping_score,
+    }
 
 
 if __name__ == '__main__':
