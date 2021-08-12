@@ -99,7 +99,7 @@ def upload_image():
             # TODO: Place line that sends image to model to get classification result
             
             #preprocess the image before sending to model
-            prepocess(image)
+            img = prepocess(image)
             
             #send to model and predict class
             pred = model.predict([img])
