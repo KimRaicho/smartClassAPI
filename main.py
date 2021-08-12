@@ -2,6 +2,7 @@ import train_model as m
 import os
 import numpy as np
 from keras.models import load_model
+import dataset_preprocess as aq
 
 
 def print_equal():
@@ -117,7 +118,7 @@ def load_best_model():
 
 def main():
     # can retrieve arrays from acquisition.py
-    #train_x, train_y, val_x, val_y, test_x, test_y = aq.data_acquisition()  # make sure the Database folder is in the
+    train_x, train_y, val_x, val_y, test_x, test_y = aq.data_acquisition()  # make sure the Database folder is in the
     # same directory as the project
 
     # get data from numpy arrays containing preprocessed images
@@ -165,6 +166,7 @@ def main():
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=4, kernel_size=7)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=5, kernel_size=9)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=6, kernel_size=11)
+    # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=7, kernel_size=13)
 
     # ================================================================================================
 

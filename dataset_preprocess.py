@@ -5,25 +5,39 @@ import numpy as np
 
 def data_acquisition(folder_path='\Final_Dataset'):
     cropped_images = []
+    attentive_images = []
+    not_attentive_images = []
+    sleepy_images = []
 
     full_set_path = os.getcwd() + folder_path
 
     print('Reading Images...')
-    num = 1
     for filename in os.listdir(full_set_path):
-        image_name = (full_set_path + '\\' + filename)
+        image_name = (full_set_path + '//' + filename)
+        class_name = filename.split('_')[0]
 
-        # resize the image
-        img = (image_crop(image_name))
-        cropped_images.append(img)
-        num += 1
+        if class_name == 'attentive':
+            img = (image_crop(image_name))
+            attentive_images.append(img)
+
+        elif class_name == 'not':
+            img = (image_crop(image_name))
+            not_attentive_images.append(img)
+
+        else:
+            img = (image_crop(image_name))
+            sleepy_images.append(img)
+
+        # concatenate the arrays
+    cropped_images = attentive_images + not_attentive_images + sleepy_images
+
     print('Done pre-processing images')
     return divide_datasets(cropped_images)
 
 
 def image_crop(image_name):
-    # read image as grayscale
-    image = cv2.imread(image_name, 0)
+    # read image as color image
+    image = cv2.imread(image_name, 3)
 
     cropped_image = cv2.resize(image, (270, 540))
 
@@ -48,73 +62,64 @@ def divide_datasets(array):
     testing_set_labels = []
 
     # training set
-    for img in os.listdir('Final_Dataset'):
-        name = img.split('_')
-
-        if name[0] == 'attentive':
-            i = int(name[1])
-
-            while i < 18:
+    i = 0
+    j = 0
+    k = 0
+    m = 0
+    for img in array:
+        if i < 65:
+            if j < 35:
                 training_set.append(img)
                 training_set_labels.append(0)
-                i += 1
-
-            while i < 23:
+            elif j < 50:
                 validation_set.append(img)
                 validation_set_labels.append(0)
-                i += 1
-
-            while i < 28:
+            else:
                 testing_set.append(img)
                 testing_set_labels.append(0)
-                i += 1
 
-        if name[0] == 'not_attentive':
-            i = int(name[1])
+            j += 1
 
-            while i < 13:
+        elif i < 62:
+            if k < 42:
                 training_set.append(img)
-                training_set_labels.append(0)
-                i += 1
-
-            while i < 18:
+                training_set_labels.append(1)
+            elif k < 52:
                 validation_set.append(img)
-                validation_set_labels.append(0)
-                i += 1
-
-            while i < 23:
+                validation_set_labels.append(1)
+            else:
                 testing_set.append(img)
-                testing_set_labels.append(0)
-                i += 1
+                testing_set_labels.append(1)
 
-        if name[0] == 'sleepy':
-            i = int(name[1])
+            k += 1
 
-            while i < 14:
+        else:
+            if m < 27:
                 training_set.append(img)
-                training_set_labels.append(0)
-                i += 1
-
-            while i < 19:
+                training_set_labels.append(2)
+            elif m < 37:
                 validation_set.append(img)
-                validation_set_labels.append(0)
-                i += 1
-
-            while i < 24:
+                validation_set_labels.append(2)
+            else:
                 testing_set.append(img)
-                testing_set_labels.append(0)
-                i += 1
+                testing_set_labels.append(2)
+
+            m += 1
+
+        i += 1
+
+    print('Finished creating Datasets')
 
     # convert to numpy arrays and scale the images by 255
-    training_set = np.asarray(training_set, dtype=np.uint8).reshape((800, 272, 544, 1))
+    training_set = np.asarray(training_set, dtype=np.uint8).reshape((104, 270, 540, 3))
     training_set = normalize(training_set)
     training_set_labels = np.asarray(training_set_labels, dtype=np.int).reshape(-1, 1)
 
-    validation_set = np.asarray(validation_set, dtype=np.uint8).reshape((400, 272, 544, 1))
+    validation_set = np.asarray(validation_set, dtype=np.uint8).reshape((30, 270, 540, 3))
     validation_set = normalize(validation_set)
     validation_set_labels = np.asarray(validation_set_labels, dtype=np.int).reshape(-1, 1)
 
-    testing_set = np.asarray(testing_set, dtype=np.uint8).reshape((400, 272, 544, 1))
+    testing_set = np.asarray(testing_set, dtype=np.uint8).reshape((30, 270, 540, 3))
     testing_set = normalize(testing_set)
     testing_set_labels = np.asarray(testing_set_labels, dtype=np.int).reshape(-1, 1)
 
