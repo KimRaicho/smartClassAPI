@@ -1,11 +1,20 @@
 import base64
 import io
 import os
+import cv2
+import numpy as np
+from datetime import datetime
 from flask import Flask, request, render_template
 from flask_restful import Api, abort
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from PIL import Image
+
+# Load model
+from keras.models import load_model
+
+model = load_model('smart_class.h5')
+print("Model loaded successfully")
 
 UPLOAD_FOLDER = 'static/uploads/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -24,13 +33,14 @@ class ImageModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     image = db.Column(db.Text, nullable=False)  # Data to render the pic in browser
     name = db.Column(db.Text, nullable=False)
-    # TODO: Add field for result from Model
+    classification = db.Column(db.Text, nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Image (ID: {self.id} Name: {self.name} Data: {self.image})"
+        return f"Image (ID: {self.id} Name: {self.name} Created on: {self.date})"
 
 
-# db.create_all()
+db.create_all()
 
 
 def render_picture(data):
@@ -42,6 +52,26 @@ def render_picture(data):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# Function to normalize image (make it pixel values range from 0-1 for easier processing)
+def normalize(data):
+    shape = data.shape
+    normalized_data = np.reshape(data, (shape[0], -1))
+    normalized_data = normalized_data.astype('float32') / 255.
+
+    return np.reshape(normalized_data, shape)
+
+
+# Function to Preprocess the images for CNN modelling
+def preprocess(img):
+    # image = cv2.resize(img, (270, 540))
+
+    # convert image to numpy array
+    image = np.asarray(img, dtype=np.uint8).reshape((1, 270, 540, 3))
+    image = normalize(image)
+
+    return image
 
 
 @app.route("/upload", methods=['POST'])
@@ -61,20 +91,33 @@ def upload_image():
             if not filename or not data:
                 abort(400, message="Bad upload!")
             render_file = render_picture(data)
+
+            # Open the image and send it for preprocessing
+            img = Image.open(io.BytesIO(data))
+            preprocessed_img = preprocess(img)
+            # Send the image to the model
+            pred = model.predict([preprocessed_img])
+            final_pred = np.argmax(pred)
+
+            if final_pred == 0:
+                result = 'Attentive'
+            elif final_pred == 1:
+                result = 'Inattentive'
+            else:
+                result = 'Sleeping'
+
             # Add to the database the name of the image
-            image = ImageModel(image=render_file, name=filename)
+            image = ImageModel(image=render_file, name=filename, classification=result)
             db.session.add(image)
             db.session.commit()
-            # TODO: Place line that sends image to model to get classification result
             # Save the image in our upload folder
-            img = Image.open(io.BytesIO(data))
             img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return f"Image uploaded and stored: ({image.name})", 201
+            print(image)
+            return f"Image uploaded and stored: (Name: {image.name} Classification: {image.classification})", 201
         else:
             return f"Image already exists in database", 400
     else:
         return f"Allowed image types are -> png, jpg, jpeg", 400
-
 
 @app.route("/image/<int:image_id>")
 def retrieve(image_id):
@@ -89,8 +132,8 @@ def retrieve(image_id):
 @app.route("/report", methods=['GET'])
 def send_report():
     # TODO: Create a query that goes through the db and counts the number of times different classifications appear
-    attentive_score = 180
-    inattentive_score = 95
+    attentive_score = 201
+    inattentive_score = 54
     sleeping_score = 12
 
     return {
