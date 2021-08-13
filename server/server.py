@@ -1,7 +1,6 @@
 import base64
 import io
 import os
-import cv2
 import numpy as np
 from datetime import datetime
 from flask import Flask, request, render_template
@@ -34,13 +33,13 @@ class ImageModel(db.Model):
     image = db.Column(db.Text, nullable=False)  # Data to render the pic in browser
     name = db.Column(db.Text, nullable=False)
     classification = db.Column(db.Text, nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    date = db.Column(db.Text, nullable=False, default=datetime.now().date().strftime("%d/%m/%Y"))
 
     def __repr__(self):
         return f"Image (ID: {self.id} Name: {self.name} Created on: {self.date})"
 
 
-db.create_all()
+# db.create_all()
 
 
 def render_picture(data):
@@ -65,8 +64,7 @@ def normalize(data):
 
 # Function to Preprocess the images for CNN modelling
 def preprocess(img):
-    image = cv2.imread(img, 3)
-    image = cv2.resize(image, (270, 540))
+    image = img.resize((270, 540))
 
     # convert image to numpy array
     image = np.asarray(image, dtype=np.uint8).reshape((1, 270, 540, 3))
@@ -132,17 +130,27 @@ def retrieve(image_id):
 
 @app.route("/report", methods=['GET'])
 def send_report():
-    test_count = ImageModel.query.filter_by(classification='Attentive', date=datetime.today()).all()
-    print(len(test_count))
-    attentive_score = 201
-    inattentive_score = 54
-    sleeping_score = 12
+    attentive_count = db.session.query(ImageModel).filter(
+        ImageModel.classification.like('Attentive'),
+        ImageModel.date.like(datetime.now().date().strftime("%d/%m/%Y"))).count()
+    # print(attentive_count)
+    inattentive_count = db.session.query(ImageModel).filter(
+        ImageModel.classification.like('Inattentive'),
+        ImageModel.date.like(datetime.now().date().strftime("%d/%m/%Y"))).count()
+    # print(inattentive_count)
+    sleeping_count = db.session.query(ImageModel).filter(
+        ImageModel.classification.like('Sleeping'),
+        ImageModel.date.like(datetime.now().date().strftime("%d/%m/%Y"))).count()
+    # print(sleeping_count)
 
-    return {
-        "attentive": attentive_score,
-        "inattentive": inattentive_score,
-        "sleeping": sleeping_score,
-    }
+    if attentive_count == 0 and inattentive_count == 0 and sleeping_count == 0:
+        return {"error": "No images in database!"}, 400
+    else:
+        return {
+            "attentive": attentive_count,
+            "inattentive": inattentive_count,
+            "sleeping": sleeping_count,
+        }, 201
 
 
 if __name__ == '__main__':
