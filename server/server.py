@@ -34,7 +34,7 @@ class ImageModel(db.Model):
     image = db.Column(db.Text, nullable=False)  # Data to render the pic in browser
     name = db.Column(db.Text, nullable=False)
     classification = db.Column(db.Text, nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     def __repr__(self):
         return f"Image (ID: {self.id} Name: {self.name} Created on: {self.date})"
@@ -65,10 +65,11 @@ def normalize(data):
 
 # Function to Preprocess the images for CNN modelling
 def preprocess(img):
-    # image = cv2.resize(img, (270, 540))
+    image = cv2.imread(img, 3)
+    image = cv2.resize(image, (270, 540))
 
     # convert image to numpy array
-    image = np.asarray(img, dtype=np.uint8).reshape((1, 270, 540, 3))
+    image = np.asarray(image, dtype=np.uint8).reshape((1, 270, 540, 3))
     image = normalize(image)
 
     return image
@@ -119,19 +120,20 @@ def upload_image():
     else:
         return f"Allowed image types are -> png, jpg, jpeg", 400
 
+
 @app.route("/image/<int:image_id>")
 def retrieve(image_id):
     img = ImageModel.query.filter_by(id=image_id).first()
     if not img:
         return render_template('display.html', filename=None), 404
     # redirect(url_for('static', filename='uploads/' + img.name), code=301)
-    # TODO: Return to the user a URL to download the image
     return render_template('display.html', filename=img.name)
 
 
 @app.route("/report", methods=['GET'])
 def send_report():
-    # TODO: Create a query that goes through the db and counts the number of times different classifications appear
+    test_count = ImageModel.query.filter_by(classification='Attentive', date=datetime.today()).all()
+    print(len(test_count))
     attentive_score = 201
     inattentive_score = 54
     sleeping_score = 12
