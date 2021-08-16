@@ -155,7 +155,7 @@ def main():
 
     # ============================== see the effect of increasing layers ============================
 
-    # do_experiment([train_x, trval_x, vain_y, al_y, test_x, test_y], name='conv_layers')
+    # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='conv_layers')
 
     # ===============================================================================================
 
