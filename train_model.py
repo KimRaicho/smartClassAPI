@@ -6,8 +6,8 @@ def create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2, init
                  num_of_fc_layers=2, strides=1, model_name='base_model', do_padding=True):
     model = tf.keras.models.Sequential(name=model_name)
 
-    # add input layer (128x128) grayscale images
-    model.add(tf.keras.layers.InputLayer(input_shape=[128, 128, 1], name='input_layer'))
+    # add input layer (270x540) grayscale images
+    model.add(tf.keras.layers.InputLayer(input_shape=[270, 540, 1], name='input_layer'))
 
 
 
@@ -22,6 +22,7 @@ def create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2, init
             model.add(tf.keras.layers.Conv2D(filters=init_num_kernels, kernel_size=init_kernel_size, strides=strides,
                                              padding='same', activation='relu', kernel_initializer=initializer,
                                              name=f'conv_{num}'))
+            
         else:
             # don't add zero padding
             model.add(tf.keras.layers.Conv2D(filters=init_num_kernels, kernel_size=init_kernel_size, strides=strides,
@@ -36,8 +37,8 @@ def create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2, init
         if init_num_kernels < 512:
             init_num_kernels *= 2
         # decrease the kernel size
-        if init_kernel_size > 1:
-            init_kernel_size -= 2
+        # if init_kernel_size > 1:
+        #     init_kernel_size -= 2
         # increase variable for naming
         num += 1
 
@@ -59,8 +60,8 @@ def create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2, init
         num += 1
 
     soft_initializer = tf.keras.initializers.glorot_normal(seed=SEED)
-    # connect with softmax layer for classification. We have 400 subjects, therefore 400 neurons
-    model.add(tf.keras.layers.Dense(units=400, activation='softmax', kernel_initializer=soft_initializer,
+    # connect with softmax layer for classification. We have 3 classes: attentive, inattntive and sleepy
+    model.add(tf.keras.layers.Dense(units=3, activation='softmax', kernel_initializer=soft_initializer,
                                     name='output_layer'))
 
     # print the model summary
@@ -72,8 +73,16 @@ def create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2, init
 def compile_model(model: tf.keras.Model, learning_rate):
 
     # compile model, returns None
-    model.compile(optimizer=tf.keras.optimizers.RMSprop(learning_rate=learning_rate),
+    model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate),
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(),
                   metrics=tf.keras.metrics.SparseCategoricalAccuracy())
+
+    # model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+    #               loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    #               metrics=tf.keras.metrics.SparseCategoricalAccuracy())
+
+    # model.compile(optimizer=tf.keras.optimizers.RMSProp(learning_rate=learning_rate),
+    #               loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    #               metrics=tf.keras.metrics.SparseCategoricalAccuracy())
 
 

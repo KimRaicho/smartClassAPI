@@ -4,7 +4,6 @@ import numpy as np
 from keras.models import load_model
 import dataset_preprocess as aq
 
-
 def print_equal():
     return ' ==================================== '
 
@@ -21,9 +20,9 @@ def train(model: m.tf.keras.Model, epochs, batch_size, train_x, train_y, val_x, 
     callbacks = [
         # save the model at the end of each epoch(save_best_only=False) or save the model with best performance on
         # validation set(save_best_only=True)
-        m.tf.keras.callbacks.ModelCheckpoint('iris_deep_model.h5', save_best_only=True),
+        m.tf.keras.callbacks.ModelCheckpoint('best_models/smart_class.h5', save_best_only=True),
         # perform early stopping when there's no increase in performance on the validation set in (patience) epochs
-        m.tf.keras.callbacks.EarlyStopping(patience=115, restore_best_weights=True),
+        m.tf.keras.callbacks.EarlyStopping(patience=200, restore_best_weights=True),
         # tensorboard callback
         m.tf.keras.callbacks.TensorBoard(run_logdir)
     ]
@@ -111,29 +110,29 @@ def load_best_model():
         batch_norm & max_pool_layer after each conv layer
     """
     # os.chdir('best_model')
-    model_name = 'iris_deep_model.h5'
+    model_name = 'best_models/smart_class.h5'
     best_model = m.tf.keras.models.load_model(model_name)
     return best_model
 
 
 def main():
     # can retrieve arrays from acquisition.py
-    train_x, train_y, val_x, val_y, test_x, test_y = aq.data_acquisition()  # make sure the Database folder is in the
+    # train_x, train_y, val_x, val_y, test_x, test_y = aq.data_acquisition()  # make sure the Database folder is in the
     # same directory as the project
 
     # get data from numpy arrays containing preprocessed images
     print('Reading data...')
-    train_x = np.load('train_x.npy')
-    train_y = np.load('train_y.npy')
-    val_x = np.load('val_x.npy')
-    val_y = np.load('val_y.npy')
-    test_x = np.load('test_x.npy')
-    test_y = np.load('test_y.npy')
+    train_x = np.load('datasets/train_x.npy')
+    train_y = np.load('datasets/train_y.npy')
+    val_x = np.load('datasets/val_x.npy')
+    val_y = np.load('datasets/val_y.npy')
+    test_x = np.load('datasets/test_x.npy')
+    test_y = np.load('datasets/test_y.npy')
     print('Done!')
 
     # params for experiments
     learning_rate = 1e-3
-    epochs = 250  # max epochs, early stopping may cause training to stop earlier
+    epochs = 200  # max epochs, early stopping may cause training to stop earlier
     batch_size = 32
 
     """
@@ -143,10 +142,10 @@ def main():
     # create base model with 2 Conv layers and 1 fully-connected layer -> accuracy 75%
     # base_model = m.create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2,
     #                                 init_num_neurons_fc_layer=512, num_of_fc_layers=2, strides=1, do_padding=True)
-    #
+    
     # m.compile_model(base_model, learning_rate)
 
-    # train base model
+    # # train base model
     # print(f'{print_equal()} Training {print_equal()}')
     # train(base_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='base_model')
     # #
@@ -156,7 +155,7 @@ def main():
 
     # ============================== see the effect of increasing layers ============================
 
-    # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='conv_layers')
+    # do_experiment([train_x, trval_x, vain_y, al_y, test_x, test_y], name='conv_layers')
 
     # ===============================================================================================
 
@@ -166,7 +165,6 @@ def main():
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=4, kernel_size=7)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=5, kernel_size=9)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=6, kernel_size=11)
-    # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=7, kernel_size=13)
 
     # ================================================================================================
 
@@ -182,19 +180,30 @@ def main():
     # best_model = m.create_model(init_num_kernels=64, init_kernel_size=7, num_conv_layers=3,
     #                             init_num_neurons_fc_layer=512,
     #                             num_of_fc_layers=1, strides=1, do_padding=False)
-    #
+    
     # m.compile_model(best_model, learning_rate)
     # print(f'{print_equal()} Training {print_equal()}')
     # train(best_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='best_model')
     # evaluate_model(best_model, test_x, test_y, f'conv_layers_{3}_padd_false')
 
     # ==============================================================================================
+    # ============================My Test Train=======================================================
+
+    # best_model = m.create_model(init_num_kernels=64, init_kernel_size=3, num_conv_layers=3,
+    #                             init_num_neurons_fc_layer=32,
+    #                             num_of_fc_layers=1, strides=1, do_padding=False)
+    
+    # m.compile_model(best_model, learning_rate)
+    # print(f'{print_equal()} Training {print_equal()}')
+    # train(best_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='best_model')
+    # evaluate_model(best_model, test_x, test_y, f'conv_layers_{2}_padd_false')
+
 
     # ================================= load and evaluate best model ===============================
 
-    # best_model = load_best_model()
-    # # evaluate model
-    # evaluate_model(best_model, test_x, test_y, 'best_model')
+    best_model = load_best_model()
+    # evaluate model
+    evaluate_model(best_model, test_x, test_y, 'best_model')
 
     # ==============================================================================================
 
