@@ -67,7 +67,7 @@ def preprocess(img):
     image = img.resize((270, 540))
 
     # convert image to numpy array
-    image = np.asarray(image, dtype=np.uint8).reshape((1, 270, 540, 3))
+    image = np.asarray(image, dtype=np.uint8).reshape((1, 270, 540, 1))
     image = normalize(image)
 
     return image
