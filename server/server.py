@@ -7,7 +7,7 @@ from flask import Flask, request, render_template
 from flask_restful import Api, abort
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
-from PIL import Image
+from PIL import Image, ImageOps
 
 # Load model
 from keras.models import load_model
@@ -64,6 +64,10 @@ def normalize(data):
 
 # Function to Preprocess the images for CNN modelling
 def preprocess(img):
+    #convert image to grayscale
+    img = ImageOps.grayscale(img)
+    
+    #resize image
     image = img.resize((270, 540))
 
     # convert image to numpy array
