@@ -64,10 +64,10 @@ def normalize(data):
 
 # Function to Preprocess the images for CNN modelling
 def preprocess(img):
-    #convert image to grayscale
+    # Convert image to grayscale
     img = ImageOps.grayscale(img)
     
-    #resize image
+    # Resize image
     image = img.resize((270, 540))
 
     # convert image to numpy array

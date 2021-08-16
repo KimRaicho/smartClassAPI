@@ -131,3 +131,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /server/smart_class.h5
+/server/smart_class_v1.h5
