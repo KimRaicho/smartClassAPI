@@ -81,7 +81,7 @@ def compile_model(model: tf.keras.Model, learning_rate):
     #               loss=tf.keras.losses.SparseCategoricalCrossentropy(),
     #               metrics=tf.keras.metrics.SparseCategoricalAccuracy())
 
-    # model.compile(optimizer=tf.keras.optimizers.RMSProp(learning_rate=learning_rate),
+    # model.compile(optimizer=tf.keras.optimizers.RMSprop(learning_rate=learning_rate),
     #               loss=tf.keras.losses.SparseCategoricalCrossentropy(),
     #               metrics=tf.keras.metrics.SparseCategoricalAccuracy())
 
