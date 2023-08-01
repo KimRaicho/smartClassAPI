@@ -160,6 +160,7 @@ def main():
     # ===============================================================================================
 
     # ============================ see effect of increasing fc layers ================================
+    # TODO: Please comment do not understand the last two methods. 
 
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=3, kernel_size=5)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=4, kernel_size=7)
