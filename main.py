@@ -50,7 +50,7 @@ def do_experiment(data, name='conv_layers', conv_layers=3, kernel_size=5):
     init_kernel_size = 5
     learning_rate = 1e-3
     epochs = 250
-    batch_size = 64
+    batch_size = 120
     if name == 'conv_layers':
         # do experiment for increasing number of conv layers from base model with constant number of fully connected
         # layers(2) stride = 1 and padding true
