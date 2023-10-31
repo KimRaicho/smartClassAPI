@@ -160,8 +160,7 @@ def main():
     # ===============================================================================================
 
     # ============================ see effect of increasing fc layers ================================
-    # TODO: Please comment do not understand the last two methods. 
-
+    
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=3, kernel_size=5)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=4, kernel_size=7)
     # do_experiment([train_x, train_y, val_x, val_y, test_x, test_y], name='fc_layers', conv_layers=5, kernel_size=9)
@@ -176,7 +175,7 @@ def main():
 
     # =================================================================================================
 
-    # ====================== train candidate best configuration with padding ======================
+    # ====================== train candidate best configuration with padding ==========================
 
     # best_model = m.create_model(init_num_kernels=64, init_kernel_size=7, num_conv_layers=3,
     #                             init_num_neurons_fc_layer=512,
@@ -187,8 +186,8 @@ def main():
     # train(best_model, epochs, batch_size, train_x, train_y, val_x, val_y, exp_name='best_model')
     # evaluate_model(best_model, test_x, test_y, f'conv_layers_{3}_padd_false')
 
-    # ==============================================================================================
-    # ============================My Test Train=======================================================
+    # ================================================================================================
+    # ================================My Test Train===================================================
 
     # best_model = m.create_model(init_num_kernels=64, init_kernel_size=3, num_conv_layers=3,
     #                             init_num_neurons_fc_layer=32,
