@@ -139,7 +139,7 @@ def main():
         Uncomment sections under '===' signs to run various experiments
     """
     # ============================ Create and test Base Model ======================================
-    # create base model with 2 Conv layers and 1 fully-connected layer -> accuracy 75%
+    # create base model with 3 Conv layers and 1 fully-connected layer -> accuracy 80%
     # base_model = m.create_model(init_num_kernels=4, init_kernel_size=3, num_conv_layers=2,
     #                                 init_num_neurons_fc_layer=512, num_of_fc_layers=2, strides=1, do_padding=True)
     
